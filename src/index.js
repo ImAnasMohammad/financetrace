@@ -3,11 +3,23 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { PaymentsProvider } from './hooks/usePayments';
+import { BrowserRouter } from 'react-router-dom';
+import { ColorsProvider } from './hooks/useColors';
+import { CategoriesProvider } from './hooks/useCategories';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <BrowserRouter>
+      <PaymentsProvider>
+        <ColorsProvider>
+          <CategoriesProvider>
+            <App />
+          </CategoriesProvider>
+        </ColorsProvider>
+      </PaymentsProvider>
+    </BrowserRouter>
   </React.StrictMode>
 );
 
