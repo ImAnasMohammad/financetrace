@@ -7,6 +7,8 @@ import { PaymentsProvider } from './hooks/usePayments';
 import { BrowserRouter } from 'react-router-dom';
 import { ColorsProvider } from './hooks/useColors';
 import { CategoriesProvider } from './hooks/useCategories';
+import { OTPTokenProvider } from './hooks/useOTPToken';
+import { AccessTokenProvider } from './hooks/AccessToken';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -15,7 +17,11 @@ root.render(
       <PaymentsProvider>
         <ColorsProvider>
           <CategoriesProvider>
-            <App />
+            <OTPTokenProvider>
+              <AccessTokenProvider>
+                <App />
+              </AccessTokenProvider>
+            </OTPTokenProvider>
           </CategoriesProvider>
         </ColorsProvider>
       </PaymentsProvider>

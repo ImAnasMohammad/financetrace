@@ -7,8 +7,12 @@ import Expense from './pages/Expense';
 import Budgets from './pages/Budgets';
 import usePayments from './hooks/usePayments';
 import useCategories from './hooks/useCategories';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Router, Routes } from 'react-router-dom';
 import HomeLayout from './layouts/HomeLayout';
+import Login from './pages/Login';
+import VerifyOTP from './pages/VerifyOTP';
+import AuthProtectedRoute from './VerifyRoutes/AuthProtectedRoute';
+import PublicRoute from './VerifyRoutes/PublicRoute';
 
 
 
@@ -43,14 +47,14 @@ export default function ExpenseTracker() {
     notes: ''
   });
 
-  
-  
+
+
   const addIncome = () => {
     if (!incomeForm.source || !incomeForm.amount) return;
-    
+
     if (editingItem && editingItem.type === 'income') {
-      setIncome(income.map(item => 
-        item.id === editingItem.id 
+      setIncome(income.map(item =>
+        item.id === editingItem.id
           ? { ...incomeForm, amount: parseFloat(incomeForm.amount), id: item.id }
           : item
       ));
@@ -63,19 +67,19 @@ export default function ExpenseTracker() {
         date: incomeForm.date,
         notes: incomeForm.notes
       };
-      setIncome([...income, newIncome]);
+      // setIncome([...income, newIncome]);
     }
-    
+
     setIncomeForm({ source: '', amount: '', date: new Date().toISOString().split('T')[0], notes: '' });
     setShowIncomeForm(false);
   };
 
   const addExpense = () => {
     if (!expenseForm.amount) return;
-    
+
     if (editingItem && editingItem.type === 'expense') {
-      setExpenses(expenses.map(item => 
-        item.id === editingItem.id 
+      setExpenses(expenses.map(item =>
+        item.id === editingItem.id
           ? { ...expenseForm, amount: parseFloat(expenseForm.amount), id: item.id }
           : item
       ));
@@ -91,7 +95,7 @@ export default function ExpenseTracker() {
       };
       setExpenses([...expenses, newExpense]);
     }
-    
+
     setExpenseForm({ amount: '', category: 'Food', date: new Date().toISOString().split('T')[0], paymentMode: 'UPI', notes: '' });
     setShowExpenseForm(false);
   };
@@ -136,7 +140,7 @@ export default function ExpenseTracker() {
       const date = new Date(item.date);
       return date.getMonth() + 1 === filterMonth && date.getFullYear() === filterYear;
     };
-    
+
     return {
       income: income.filter(filterFunc),
       expenses: expenses.filter(filterFunc)
@@ -144,7 +148,7 @@ export default function ExpenseTracker() {
   };
 
   const { income: filteredIncome, expenses: filteredExpenses } = getFilteredData();
-  
+
   const totalIncome = filteredIncome.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
   const totalExpenses = filteredExpenses.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
   const savings = totalIncome - totalExpenses;
@@ -163,14 +167,14 @@ export default function ExpenseTracker() {
       const d = new Date(filterYear, filterMonth - 1 - i, 1);
       const month = d.getMonth() + 1;
       const year = d.getFullYear();
-      
+
       const monthExpenses = expenses
         .filter(e => {
           const date = new Date(e.date);
           return date.getMonth() + 1 === month && date.getFullYear() === year;
         })
         .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-      
+
       months.push({
         name: d.toLocaleString('default', { month: 'short' }),
         expenses: monthExpenses
@@ -180,78 +184,36 @@ export default function ExpenseTracker() {
   };
 
   return (
-
     <Routes>
-      <Route path="/" element={
-<HomeLayout>
-          <Dashboard
-            totalIncome={totalIncome}
-            totalExpenses={totalExpenses}
-            savings={savings}
-            savingsPercentage={savingsPercentage}
-            categoryExpenses={categoryExpenses}
-            getMonthlyTrend={getMonthlyTrend}
-          />
-        </HomeLayout>
-      } />
+      <Route path="/" element={<PublicRoute />}>
+        <Route path="/" element={<Login />} />
+        <Route path="/verify-otp" element={<VerifyOTP />} />
+      </Route>
+
+      {/* 🔐 Protected Routes (ONE TIME) */}
+      <Route element={<AuthProtectedRoute />}>
+        <Route path="/dashboard" element={
+          <HomeLayout>
+            <Dashboard />
+          </HomeLayout>
+        } />
+        <Route path="/dashboard/income" element={
+          <HomeLayout>
+            <Income />
+          </HomeLayout>
+        } />
+        <Route path="/dashboard/expenses" element={
+          <HomeLayout>
+            <Expense />
+          </HomeLayout>
+        } />
+        <Route path="/dashboard/budgets" element={
+          <HomeLayout>
+            <Budgets />
+          </HomeLayout>
+        } />
+      </Route>
+      <Route path='*' element={<h1>404 page not found</h1>}/>
     </Routes>
-    // <div className="min-h-screen bg-gray-50">
-    //   <Navbar/>
-    //   <div className="max-w-7xl mx-auto px-4 py-6">
-    //     <SelectTime filterMonth={filterMonth} filterYear={filterYear} setFilterMonth={setFilterMonth} setFilterYear={setFilterYear} />
-
-    //     {activeTab === 'dashboard' && (
-    //       <Dashboard
-    //         totalIncome={totalIncome}
-    //         totalExpenses={totalExpenses}
-    //         savings={savings}
-    //         savingsPercentage={savingsPercentage}
-    //         categoryExpenses={categoryExpenses}
-    //         getMonthlyTrend={getMonthlyTrend}
-    //       />
-    //     )}
-
-    //     {activeTab === 'income' && (
-    //       <Income
-    //         showIncomeForm={showIncomeForm}
-    //         setShowIncomeForm={setShowIncomeForm}
-    //         incomeForm={incomeForm}
-    //         setIncomeForm={setIncomeForm}
-    //         addIncome={addIncome}
-    //         filteredIncome={filteredIncome}
-    //         editIncome={editIncome}
-    //         deleteIncome={deleteIncome}
-    //         editingItem={editingItem}
-    //         setEditingItem={setEditingItem}
-    //       />
-    //     )}
-
-    //     {activeTab === 'expenses' && (
-    //       <Expense
-    //         showExpenseForm={showExpenseForm}
-    //         setShowExpenseForm={setShowExpenseForm}
-    //         expenseForm={expenseForm}
-    //         setExpenseForm={setExpenseForm}
-    //         addExpense={addExpense}
-    //         filteredExpenses={filteredExpenses}
-    //         editExpense={editExpense}
-    //         deleteExpense={deleteExpense}
-    //         editingItem={editingItem}
-    //         setEditingItem={setEditingItem}
-    //         categories={categories}
-    //         payments={payments}
-    //       />
-    //     )}
-
-    //     {activeTab === 'budgets' && (
-    //       <Budgets
-    //         categories={categories}
-    //         budgets={budgets}
-    //         filteredExpenses={filteredExpenses}
-    //         updateBudget={updateBudget}
-    //       />
-    //     )}
-    //   </div>
-    // </div>
   );
 }
