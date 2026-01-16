@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "letsgo": "node server.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
