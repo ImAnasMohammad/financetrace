@@ -49,7 +49,7 @@ const Budgets = () => {
         } catch (err) {
             setError(err.message);
         }
-    }, [API_BASE_URL, accessToken]);
+    }, [ accessToken]);
 
 
     useEffect(() => {

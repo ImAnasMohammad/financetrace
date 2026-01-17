@@ -66,7 +66,7 @@ const Dashboard = () => {
         } finally {
             setLoading(false);
         }
-    }, [API_BASE_URL, accessToken]);
+    }, [ accessToken]);
 
 
     useEffect(() => {
