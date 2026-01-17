@@ -44,7 +44,7 @@ const Expense = () => {
 
     useEffect(() => {
         fetchExpenses();
-    }, []);
+    }, [fetchExpenses]);
 
     /* ---------------- ADD / UPDATE ---------------- */
     const handleSubmit = async () => {

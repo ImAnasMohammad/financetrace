@@ -48,7 +48,7 @@ const Budgets = () => {
     useEffect(() => {
         fetchBudgets();
         fetchExpenses();
-    }, []);
+    }, [fetchBudgets,fetchExpenses]);
 
     /* -------- UPDATE BUDGET -------- */
     const updateBudget = async (category, value) => {
