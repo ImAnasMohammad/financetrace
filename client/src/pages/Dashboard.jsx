@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useCallback } from "react";
 import { TrendingUp, TrendingDown, DollarSign } from "lucide-react";
 import {
     PieChart,
@@ -33,10 +33,12 @@ const Dashboard = () => {
     const [categoryExpenses, setCategoryExpenses] = useState([]);
     const [monthlyTrend, setMonthlyTrend] = useState([]);
 
-    /* -------- FETCH DASHBOARD DATA -------- */
-    const fetchDashboard = async () => {
+    
+
+    const fetchDashboard = useCallback(async () => {
         try {
             setLoading(true);
+
             const res = await fetch(`${API_BASE_URL}/dashboard`, {
                 headers: { Authorization: `Bearer ${accessToken}` }
             });
@@ -44,18 +46,28 @@ const Dashboard = () => {
             const data = await res.json();
             if (!res.ok) throw new Error(data.message);
 
-            setTotalIncome(data.data.totalIncome);
-            setTotalExpenses(data.data.totalExpenses);
-            setSavings(data.data.savings);
-            setSavingsPercentage(data.data.savingsPercentage);
-            setCategoryExpenses(data.data.categoryExpenses);
-            setMonthlyTrend(data.data.monthlyTrend);
+            const {
+                totalIncome,
+                totalExpenses,
+                savings,
+                savingsPercentage,
+                categoryExpenses,
+                monthlyTrend
+            } = data.data;
+
+            setTotalIncome(totalIncome);
+            setTotalExpenses(totalExpenses);
+            setSavings(savings);
+            setSavingsPercentage(savingsPercentage);
+            setCategoryExpenses(categoryExpenses);
+            setMonthlyTrend(monthlyTrend);
         } catch (err) {
             setError(err.message);
         } finally {
             setLoading(false);
         }
-    };
+    }, [API_BASE_URL, accessToken]);
+
 
     useEffect(() => {
         fetchDashboard();

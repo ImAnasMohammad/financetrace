@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Plus, X, Edit2, Trash2 } from "lucide-react";
 import useAuthToken from "../hooks/AccessToken";
+import useCategories from "../hooks/useCategories";
+import usePayments from "../hooks/usePayments";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-const CATEGORIES = ["Food", "Travel", "Shopping", "Bills", "Entertainment", "Other"];
-const PAYMENT_MODES = ["Cash", "UPI", "Card", "Net Banking"];
-
 const Expense = () => {
-    const {getAccessToken} = useAuthToken();
+
+    const PAYMENT_MODES = usePayments();
+    const CATEGORIES = useCategories();
+    const { getAccessToken } = useAuthToken();
     const accessToken = getAccessToken();
 
     const [expenses, setExpenses] = useState([]);
@@ -26,21 +28,26 @@ const Expense = () => {
     });
 
     /* ---------------- FETCH EXPENSES ---------------- */
-    const fetchExpenses = async () => {
+
+    const fetchExpenses = useCallback(async () => {
         try {
             setLoading(true);
+
             const res = await fetch(`${API_BASE_URL}/expense`, {
                 headers: { Authorization: `Bearer ${accessToken}` }
             });
+
             const data = await res.json();
             if (!res.ok) throw new Error(data.message);
+
             setExpenses(data.data);
         } catch (err) {
             setError(err.message);
         } finally {
             setLoading(false);
         }
-    };
+    }, [API_BASE_URL, accessToken]);
+
 
     useEffect(() => {
         fetchExpenses();

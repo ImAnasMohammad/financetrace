@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import useAuthToken from "../hooks/AccessToken"
+import useCategories from "../hooks/useCategories";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-const CATEGORIES = ["Food", "Travel", "Shopping", "Bills", "Entertainment", "Other"];
 
 const Budgets = () => {
+    const CATEGORIES = useCategories();
     const { getAccessToken } = useAuthToken();
 
     const accessToken = getAccessToken();
@@ -14,41 +15,47 @@ const Budgets = () => {
     const [expenses, setExpenses] = useState([]);
     const [error, setError] = useState("");
 
-    /* -------- FETCH BUDGETS -------- */
-    const fetchBudgets = async () => {
+    const fetchBudgets = useCallback(async () => {
         try {
             const res = await fetch(`${API_BASE_URL}/budget`, {
                 headers: { Authorization: `Bearer ${accessToken}` }
             });
+
             const data = await res.json();
             if (!res.ok) throw new Error(data.message);
 
             const mapped = {};
-            data.data.forEach(b => mapped[b.category] = b.amount);
+            data.data.forEach(b => {
+                mapped[b.category] = b.amount;
+            });
+
             setBudgets(mapped);
         } catch (err) {
             setError(err.message);
         }
-    };
+    }, [accessToken]);
 
-    /* -------- FETCH EXPENSES -------- */
-    const fetchExpenses = async () => {
+
+    const fetchExpenses = useCallback(async () => {
         try {
             const res = await fetch(`${API_BASE_URL}/expense`, {
                 headers: { Authorization: `Bearer ${accessToken}` }
             });
+
             const data = await res.json();
             if (!res.ok) throw new Error(data.message);
+
             setExpenses(data.data);
         } catch (err) {
             setError(err.message);
         }
-    };
+    }, [API_BASE_URL, accessToken]);
+
 
     useEffect(() => {
         fetchBudgets();
         fetchExpenses();
-    }, [fetchBudgets,fetchExpenses]);
+    }, [fetchBudgets, fetchExpenses]);
 
     /* -------- UPDATE BUDGET -------- */
     const updateBudget = async (category, value) => {
@@ -111,10 +118,10 @@ const Budgets = () => {
                                 <div className="w-full bg-gray-200 rounded-full h-2">
                                     <div
                                         className={`h-2 rounded-full ${percentage > 100
-                                                ? "bg-red-600"
-                                                : percentage > 80
-                                                    ? "bg-yellow-500"
-                                                    : "bg-green-600"
+                                            ? "bg-red-600"
+                                            : percentage > 80
+                                                ? "bg-yellow-500"
+                                                : "bg-green-600"
                                             }`}
                                         style={{ width: `${Math.min(percentage, 100)}%` }}
                                     />

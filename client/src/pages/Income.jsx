@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Plus, X, Edit2, Trash2 } from "lucide-react";
 import useAccessToken from "../hooks/AccessToken";
 
@@ -18,22 +18,26 @@ const Income = () => {
 
     const [form, setForm] = useState(defaultData);
 
-    /* ---------------- FETCH INCOME ---------------- */
-    const fetchIncome = async () => {
+
+    const fetchIncome = useCallback(async () => {
         try {
             setLoading(true);
+
             const res = await fetch(`${API_BASE_URL}/income`, {
                 headers: { Authorization: `Bearer ${accessToken}` }
             });
+
             const data = await res.json();
             if (!res.ok) throw new Error(data.message);
+
             setIncomeList(data.data);
         } catch (err) {
             setError(err.message);
         } finally {
             setLoading(false);
         }
-    };
+    }, [API_BASE_URL, accessToken]);
+
 
     useEffect(() => {
         fetchIncome();
@@ -112,8 +116,8 @@ const Income = () => {
         }
     };
 
-    const handleForm = (e)=>{
-        
+    const handleForm = (e) => {
+
         const { name, value } = e.target;
         console.log("Form change:", name, value);
         setForm({ ...form, [name]: value });
