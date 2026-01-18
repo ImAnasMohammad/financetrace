@@ -12,7 +12,13 @@ const dashboardRoutes = require("./routes/dashboard.route");
 const app = express();
 
 // 🔹 Global Middlewares
-app.use(cors());
+app.use(cors({
+    origin: [
+        "https://trace-rwyp.onrender.com",   // Render frontend
+        "http://localhost:3000"              // local dev
+    ],
+    credentials: true
+}));
 app.use(express.json());
 
 // 🔹 Routes
