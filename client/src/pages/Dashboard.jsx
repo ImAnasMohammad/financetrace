@@ -1,4 +1,4 @@
-import React, { useEffect, useState,useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { TrendingUp, TrendingDown, DollarSign } from "lucide-react";
 import {
     PieChart,
@@ -13,7 +13,14 @@ import {
     YAxis,
     CartesianGrid
 } from "recharts";
+
+import {
+    BarChart,
+    Bar
+} from "recharts";
+
 import useAccessToken from "../hooks/AccessToken";
+import CategoryWiseSpend from "../components/CategoryWiseSpend";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -33,7 +40,12 @@ const Dashboard = () => {
     const [categoryExpenses, setCategoryExpenses] = useState([]);
     const [monthlyTrend, setMonthlyTrend] = useState([]);
 
-    
+    const sortedCategoryExpenses = useMemo(() => {
+        return [...categoryExpenses].sort((a, b) => b.value - a.value);
+    }, [categoryExpenses]);
+
+
+
 
     const fetchDashboard = useCallback(async () => {
         try {
@@ -66,7 +78,7 @@ const Dashboard = () => {
         } finally {
             setLoading(false);
         }
-    }, [ accessToken]);
+    }, [accessToken]);
 
 
     useEffect(() => {
@@ -131,6 +143,7 @@ const Dashboard = () => {
 
             {/* CHARTS */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <CategoryWiseSpend sortedCategoryExpenses={sortedCategoryExpenses}/>
                 {/* CATEGORY PIE */}
                 <div className="bg-white p-6 rounded-lg shadow">
                     <h3 className="text-lg font-semibold mb-4">Category-wise Expenses</h3>
