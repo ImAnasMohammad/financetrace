@@ -22,8 +22,36 @@ exports.createExpense = async (req, res) => {
  */
 exports.getExpenses = async (req, res) => {
     try {
-        const expenses = await Expense.find({ userId: req.user.userId }).sort({ date: -1 });
-        return sendResponse(res, 200, true, "Expenses fetched successfully", expenses);
+        const { startDate, endDate } = req.query;
+
+        let start;
+        let end;
+
+        if (startDate && endDate) {
+            // If dates are passed
+            start = new Date(startDate);
+            end = new Date(endDate);
+            end.setHours(23, 59, 59, 999);
+        } else {
+            // Default → current month
+            const now = new Date();
+            start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
+            end = new Date(now.getFullYear(), now.getMonth() + 1, 1, 0, 0, 0);
+        }
+
+        const expenses = await Expense.find({
+            userId: req.user.userId,
+            date: { $gte: start, $lt: end }
+        }).sort({ date: -1 });
+
+        return sendResponse(
+            res,
+            200,
+            true,
+            "Expenses fetched successfully",
+            expenses
+        );
+
     } catch (err) {
         console.error("Get Expenses Error:", err);
         return sendResponse(res, 500, false, "Internal server error");
