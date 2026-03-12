@@ -14,10 +14,6 @@ import {
     CartesianGrid
 } from "recharts";
 
-import {
-    BarChart,
-    Bar
-} from "recharts";
 
 import useAccessToken from "../hooks/AccessToken";
 import CategoryWiseSpend from "../components/CategoryWiseSpend";
