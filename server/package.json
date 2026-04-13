@@ -5,7 +5,7 @@
   "scripts": {
     "start": "nodemon server.js",
     "letsgo": "node server.js",
-    "build": "node index.js"
+    "build": "node server.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
