@@ -7,7 +7,6 @@
     "letsgo": "node server.js",
 
   "build": "echo build"
-
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
